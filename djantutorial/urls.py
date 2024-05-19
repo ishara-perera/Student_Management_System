@@ -22,6 +22,4 @@ import base
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('base/', include('base.urls')),
-
-
 ]

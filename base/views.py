@@ -1,9 +1,9 @@
-from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from base.models import Subject
 from base.serializers import SubjectSerializer
+from .serializers import StudentSerializer
 
 
 # Create
@@ -73,3 +73,31 @@ def delete_subject(request, subject_id):
         return Response(status=status.HTTP_204_NO_CONTENT)
     except Subject.DoesNotExist:
         return Response({'error': 'Subject not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+from rest_framework import serializers, status
+from .models import Student
+
+
+# Serializer
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = '__all__'
+
+
+@api_view(['POST'])
+def create_student(request):
+    if request.method == 'POST':
+        serializer = StudentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()  # Save the student data to the database
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_students(request):
+    students = Student.objects.all()
+    serializer = StudentSerializer(students, many=True)
+    return Response(serializer.data)
